@@ -1,7 +1,6 @@
 package v2ex
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -42,9 +41,11 @@ type Topic struct {
 
 // GetLatestTipics 获取最新主题
 func GetLatestTipics(keys []string) (topics []*Topic, err error) {
-
 	var latest []*Topic
 	err = rpc.DefaultClient.CallWithJson(nil, &latest, "GET", "https://www.v2ex.com/api/topics/latest.json", nil)
+	if err != nil {
+		return
+	}
 
 	regStr := strings.Join(keys, "|")
 	reg := regexp.MustCompile(regStr)
@@ -54,34 +55,5 @@ func GetLatestTipics(keys []string) (topics []*Topic, err error) {
 			topics = append(topics, topic)
 		}
 	}
-
-	return
-}
-
-type Payload struct {
-	Parse       string `json:"parse,omitempty"`
-	Username    string `json:"username,omitempty"`
-	Channel     string `json:"channel,omitempty"`
-	Text        string `json:"text,omitempty"`
-	LinkNames   string `json:"link_names,omitempty"`
-	UnfurlLinks bool   `json:"unfurl_links,omitempty"`
-	UnfurlMedia bool   `json:"unfurl_media,omitempty"`
-	Markdown    bool   `json:"mrkdwn,omitempty"`
-}
-
-// SendToSlack 发送消息
-func SendToSlack(topic *Topic) (err error) {
-
-	webhookURL := "https://hooks.slack.com/services/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"
-
-	payload := &Payload{
-		Channel:   "#mars-alarm",
-		Username:  fmt.Sprintf("%s - v2ex", topic.Title),
-		Text:      fmt.Sprintf("%s\n%s", topic.URL, topic.ContentRendered),
-		Markdown:  true,
-		LinkNames: topic.URL,
-	}
-
-	_, err = rpc.DefaultClient.DoRequestWithJson(nil, "POST", webhookURL, payload)
 	return
 }
