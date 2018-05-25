@@ -1,8 +1,6 @@
 package store
 
 import (
-	"fmt"
-
 	"github.com/qiniu/api.v7/auth/qbox"
 	"github.com/qiniu/api.v7/storage"
 )
@@ -39,18 +37,16 @@ func (store *Store) Save(url string) error {
 }
 
 // IfExists check exists
-func (store *Store) IfExists(url string) {
+func (store *Store) IfExists(url string) bool {
 	mac := qbox.NewMac(store.accessKey, store.secretKey)
 	cfg := storage.Config{
 		UseHTTPS: false,
 	}
 	bucketManager := storage.NewBucketManager(mac, &cfg)
 
-	fileInfo, sErr := bucketManager.Stat(store.bucket, url)
-	if sErr != nil {
-		fmt.Println(sErr)
-		return
+	fileInfo, err := bucketManager.Stat(store.bucket, url)
+	if err == nil && fileInfo.PutTime > 0 {
+		return true
 	}
-	fmt.Println(fileInfo.String())
-	fmt.Println(storage.ParsePutTime(fileInfo.PutTime))
+	return false
 }
