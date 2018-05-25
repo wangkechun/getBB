@@ -1,0 +1,8 @@
+access_key: qiniu_access_key
+secret_key: qiniu_secret_key
+bucket: bucket
+slack_webhook: https://hooks.slack.com/services/XXX/XXX/XXX
+keys:
+  - 七牛
+  - qiniu
+  - 7牛
