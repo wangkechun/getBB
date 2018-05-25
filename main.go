@@ -66,7 +66,7 @@ func WatchV2ex() {
 		payload := &alarm.Payload{
 			Channel:   "#mars-alarm",
 			Username:  fmt.Sprintf("%s - v2ex", topic.Title),
-			Text:      fmt.Sprintf("%s\n%s", topic.URL, topic.ContentRendered),
+			Text:      fmt.Sprintf("%s\n%s", topic.URL, topic.PlainText),
 			Markdown:  true,
 			LinkNames: topic.URL,
 		}

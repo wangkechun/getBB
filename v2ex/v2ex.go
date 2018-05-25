@@ -1,9 +1,11 @@
 package v2ex
 
 import (
+	"log"
 	"regexp"
 	"strings"
 
+	"github.com/PuerkitoBio/goquery"
 	rpc "qiniupkg.com/x/rpc.v7"
 )
 
@@ -14,7 +16,8 @@ type Topic struct {
 	URL             string `json:"url"`
 	Content         string `json:"content"`
 	ContentRendered string `json:"content_rendered"`
-	Replies         int    `json:"replies"`
+	PlainText       string
+	Replies         int `json:"replies"`
 	Member          struct {
 		ID           int    `json:"id"`
 		Username     string `json:"username"`
@@ -51,7 +54,15 @@ func GetLatestTipics(keys []string) (topics []*Topic, err error) {
 	reg := regexp.MustCompile(regStr)
 
 	for _, topic := range latest {
-		if len(reg.FindAllString(topic.Title, -1)) > 0 || len(reg.FindAllString(topic.Content, -1)) > 0 {
+		// Load the HTML document
+		doc, err := goquery.NewDocumentFromReader(strings.NewReader(topic.ContentRendered))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		topic.PlainText = doc.Text()
+
+		if len(reg.FindAllString(topic.Title, -1)) > 0 || len(reg.FindAllString(topic.PlainText, -1)) > 0 {
 			topics = append(topics, topic)
 		}
 	}
