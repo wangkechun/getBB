@@ -26,10 +26,13 @@ func init() {
 }
 
 func main() {
+	viper.SetDefault("slack_channel", "#user-voice")
+
 	ak := viper.GetString("access_key")
 	sk := viper.GetString("secret_key")
 	bucket := viper.GetString("bucket")
 	slackWebhook := viper.GetString("slack_webhook")
+
 	cloudStore = store.Init(ak, sk, bucket)
 	slackAlarm = &alarm.SlackAlarm{WebhookURL: slackWebhook}
 
@@ -64,7 +67,7 @@ func WatchV2ex() {
 		}
 
 		payload := &alarm.Payload{
-			Channel:   "#mars-alarm",
+			Channel:   viper.GetString("slack_channel"),
 			Username:  fmt.Sprintf("%s - v2ex", topic.Title),
 			Text:      fmt.Sprintf("%s\n%s", topic.URL, topic.PlainText),
 			Markdown:  true,
