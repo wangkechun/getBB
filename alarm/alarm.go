@@ -16,13 +16,13 @@ type Payload struct {
 	Markdown    bool   `json:"mrkdwn,omitempty"`
 }
 
-// Slack slack alarm
-type Slack struct {
+// SlackAlarm slack alarm
+type SlackAlarm struct {
 	WebhookURL string
 }
 
 // Send alarm
-func (alarm *Slack) Send(payload *Payload) (err error) {
+func (alarm *SlackAlarm) Send(payload *Payload) (err error) {
 	_, err = rpc.DefaultClient.DoRequestWithJson(nil, "POST", alarm.WebhookURL, payload)
 	return
 }
